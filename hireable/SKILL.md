@@ -73,19 +73,30 @@ Looks like this is your first hireable session. I need to set up a workspace whe
 Where should I put it? [default: ~/job-search]
 ```
 
-Wait for the user's answer (or take the default). Then:
+Wait for the user's answer (or take the default). Then run these shell commands yourself (do **not** ask the user to run them):
 
-1. Create the workspace directory at the chosen path.
-2. Copy the skill's bundled files into the workspace:
-   - `<skill-dir>/workspace-template/*` → `<workspace>/` (profile.md, targets.md, references/application-answers.md, plus empty resumes/ and dashboard/ directories, and a `.hireable/` marker)
-   - `<skill-dir>/references/*` → `<workspace>/references/` (the playbooks — listing-extraction.md, application-fill.md, etc. — so the workspace is self-contained)
-   - `<skill-dir>/templates/*` → `<workspace>/templates/`
-   - `<skill-dir>/scripts/*` → `<workspace>/scripts/`
-3. From the workspace directory, run `node scripts/init.mjs` (or `cd <workspace> && node scripts/init.mjs`). This builds the dashboard, spawns the live-reload server in the background, writes `<workspace>/.hireable/dashboard.json`, and opens `http://localhost:<port>` in the user's default browser. **Do not tell the user to run a command themselves** — run it for them and report the URL.
-4. Tell the user one line: `Workspace at <path>. Dashboard opening at http://localhost:<port>.`
-5. Continue to Branch 1 — the master resume bootstrap.
+```bash
+WORKSPACE="<chosen-path>"   # e.g. ~/job-search, expand ~ before use
+TMPDIR=$(mktemp -d)
+git clone --depth 1 https://github.com/0xmigi/hireable.git "$TMPDIR/hireable-bootstrap"
+mkdir -p "$WORKSPACE"
+cp -R "$TMPDIR/hireable-bootstrap/hireable/workspace-template/." "$WORKSPACE/"
+cp -R "$TMPDIR/hireable-bootstrap/hireable/scripts"     "$WORKSPACE/scripts"
+cp -R "$TMPDIR/hireable-bootstrap/hireable/templates"   "$WORKSPACE/templates"
+cp -R "$TMPDIR/hireable-bootstrap/hireable/references/." "$WORKSPACE/references/"
+rm -rf "$TMPDIR"
+cd "$WORKSPACE" && node scripts/init.mjs
+```
 
-The skill directory is the source of truth for playbooks, templates, and scripts. The workspace gets a self-contained copy on first run so all paths the playbooks reference (`references/`, `templates/`, `scripts/`) resolve correctly when the agent operates with the workspace as cwd.
+`workspace-template/` provides `profile.md`, `targets.md`, the `.hireable/` marker, and empty `resumes/` and `dashboard/` directories. `scripts/`, `templates/`, and the playbooks in `references/` are copied so the workspace is self-contained — the agent operates with the workspace as cwd and all relative paths resolve correctly.
+
+After init.mjs finishes:
+
+1. Read `<workspace>/.hireable/dashboard.json` to confirm the dashboard launched. If the file is missing or its `pid` isn't alive, dump `<workspace>/.hireable/dashboard.log` to the user and stop — don't proceed to Branch 1 with a broken dashboard.
+2. Tell the user one line: `Workspace at <path>. Dashboard opening at http://localhost:<port>.`
+3. Continue to Branch 1 — the master resume bootstrap.
+
+This bootstrap does not depend on `npx skills add` shipping anything beyond `SKILL.md`. The workspace gets a fresh copy of scripts, templates, and playbooks pulled directly from GitHub, so updates flow on next bootstrap and the install path is robust regardless of registry indexing.
 
 ### Branch 1 — Master resume is missing
 
