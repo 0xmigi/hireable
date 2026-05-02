@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Don't commit user-generated workspace state if anyone tests locally
+test-workspace/
+.hireable/dashboard.json
+.hireable/dashboard.log
