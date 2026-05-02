@@ -18,7 +18,7 @@ Open a session in your agent and say:
 
 > let's set up my job search
 
-The skill takes it from there.
+The skill takes it from there — creates your workspace, starts the local dashboard, and opens it in your browser. Subsequent sessions auto-revive the dashboard if it's been killed.
 
 ## Uninstall
 

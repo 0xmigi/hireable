@@ -54,6 +54,15 @@ If the workspace already exists, read `profile.md` and branch on what you find. 
 
 If the workspace doesn't exist yet, run **Branch 0** first.
 
+### Dashboard liveness check (run before any branch)
+
+Before doing anything else in an existing workspace, ensure the dashboard is alive:
+
+1. Read `<workspace>/.hireable/dashboard.json`. If it exists and the `pid` is still running (`process.kill(pid, 0)` doesn't throw), the dashboard is up at `http://localhost:<port>` — don't restart it, don't re-open the browser, just continue.
+2. If the pidfile is missing or the PID is dead, run `node scripts/init.mjs` from the workspace. The script handles the start-vs-revive decision and opens the URL in the browser. Mention the URL once in your reply, then move on.
+
+This check is silent unless something changes. Don't narrate "checking dashboard..." — just run it.
+
 ### Branch 0 — Workspace bootstrap (first-time setup)
 
 The user installed the skill via `npx skills add` but hasn't created their workspace yet. Open with one message:
@@ -72,8 +81,9 @@ Wait for the user's answer (or take the default). Then:
    - `<skill-dir>/references/*` → `<workspace>/references/` (the playbooks — listing-extraction.md, application-fill.md, etc. — so the workspace is self-contained)
    - `<skill-dir>/templates/*` → `<workspace>/templates/`
    - `<skill-dir>/scripts/*` → `<workspace>/scripts/`
-3. Tell the user: `Workspace created at <path>. Run \`node scripts/build-dashboard.mjs\` from that directory to render the dashboard, then open <path>/dashboard/index.html in a browser.`
-4. Continue to Branch 1 — the master resume bootstrap.
+3. From the workspace directory, run `node scripts/init.mjs` (or `cd <workspace> && node scripts/init.mjs`). This builds the dashboard, spawns the live-reload server in the background, writes `<workspace>/.hireable/dashboard.json`, and opens `http://localhost:<port>` in the user's default browser. **Do not tell the user to run a command themselves** — run it for them and report the URL.
+4. Tell the user one line: `Workspace at <path>. Dashboard opening at http://localhost:<port>.`
+5. Continue to Branch 1 — the master resume bootstrap.
 
 The skill directory is the source of truth for playbooks, templates, and scripts. The workspace gets a self-contained copy on first run so all paths the playbooks reference (`references/`, `templates/`, `scripts/`) resolve correctly when the agent operates with the workspace as cwd.
 
