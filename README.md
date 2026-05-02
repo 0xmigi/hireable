@@ -7,23 +7,12 @@ Designed to be **agent-harness agnostic**. Tested primarily on Claude Code, buil
 ## Install
 
 ```bash
-npx skills add <your-username>/hireable
+npx skills add 0xmigi/hireable
 ```
 
-Or, with explicit harness + scope:
+The CLI will ask which agent (Claude Code / Codex / OpenClaw / Cursor / Hermes / etc.) and whether to install globally or per-project. Pick whichever you want — the skill works the same in any of them.
 
-```bash
-# Install globally for Claude Code
-npx skills add <your-username>/hireable -g -a claude-code
-
-# Install for Codex
-npx skills add <your-username>/hireable -g -a codex
-
-# Install for multiple harnesses
-npx skills add <your-username>/hireable -g -a claude-code -a codex -a opencode
-```
-
-Then start a fresh session in your agent and say something like *"let's get my job search set up"*. The skill will activate, ask where to put your workspace (default `~/job-search/`), and walk you through getting your master resume in.
+Then start a fresh session in that agent and say something like *"let's get my job search set up"*. The skill will activate, ask where to put your workspace (default `~/job-search/`), and walk you through getting your master resume in.
 
 ## Uninstall
 
