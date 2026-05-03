@@ -32,10 +32,11 @@ There are two distinct directories you should keep clear:
 The skill directory is read-only. The user's workspace is where you read and write. **All session work happens inside the workspace** — never modify the skill directory.
 
 Find the workspace using this rule, in order:
-1. If the current working directory contains a `.hireable/` marker directory, that's the workspace.
-2. Walk up parent directories looking for `.hireable/`. If found, use that ancestor as the workspace.
-3. If the user has previously been working in `~/job-search/` and that directory has a `.hireable/`, use it.
-4. Otherwise, the workspace doesn't exist yet — go to **Branch 0** below.
+1. If `~/.config/hireable/workspace` exists, read it — its first line is the workspace path. Verify the path exists and contains a `.hireable/` marker; if so, use it. (This is the durable pointer written by Branch 0 — it survives `npx skills update` and works regardless of cwd.)
+2. If the current working directory contains a `.hireable/` marker directory, that's the workspace.
+3. Walk up parent directories looking for `.hireable/`. If found, use that ancestor as the workspace.
+4. If `~/job-search/` exists and has a `.hireable/`, use it (legacy default).
+5. Otherwise, the workspace doesn't exist yet — go to **Branch 0** below.
 
 ## How this skill works
 
@@ -85,8 +86,12 @@ cp -R "$TMPDIR/hireable-bootstrap/hireable/scripts"     "$WORKSPACE/scripts"
 cp -R "$TMPDIR/hireable-bootstrap/hireable/templates"   "$WORKSPACE/templates"
 cp -R "$TMPDIR/hireable-bootstrap/hireable/references/." "$WORKSPACE/references/"
 rm -rf "$TMPDIR"
+mkdir -p "$HOME/.config/hireable"
+echo "$WORKSPACE" > "$HOME/.config/hireable/workspace"
 cd "$WORKSPACE" && node scripts/init.mjs
 ```
+
+The `~/.config/hireable/workspace` pointer is the durable "where is this user's workspace" record. It lives outside the install dir so it survives `npx skills update` cleanly, and it lets the agent find the workspace from any cwd in future sessions.
 
 `workspace-template/` provides `profile.md`, `targets.md`, the `.hireable/` marker, and empty `resumes/` and `dashboard/` directories. `scripts/`, `templates/`, and the playbooks in `references/` are copied so the workspace is self-contained — the agent operates with the workspace as cwd and all relative paths resolve correctly.
 
