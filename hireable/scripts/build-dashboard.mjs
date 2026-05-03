@@ -1772,7 +1772,7 @@ async function main() {
           ${activityDays.map((day) => `<span class="day ${day.count ? "" : "no-events"} level-${day.level}" data-date="${day.date}" data-count="${day.count}" aria-label="${day.date} · ${day.count} ${day.count === 1 ? "event" : "events"}"></span>`).join("")}
         </div>
         <div class="heat-foot">
-          <span id="heatHover">Hover to inspect · click to filter</span>
+          <span id="heatHover">${recentActivity === 0 ? "No activity yet — your dashboard will fill in as you work." : "Hover to inspect · click to filter"}</span>
           <span class="heat-legend">
             <span>Less</span>
             <span class="day level-0"></span>
