@@ -1,5 +1,7 @@
 # hireable
 
+[![skills.sh](https://skills.sh/b/0xmigi/hireable)](https://skills.sh/0xmigi/hireable)
+
 A personal job-search skill for AI agents. You bring the job listings; the agent runs the rest — resume, applications, pipeline, follow-ups, offers. Markdown is the source of truth; a local dashboard renders it.
 
 Works in Claude Code, Codex, OpenClaw, Cursor, Hermes, and anywhere else the [`skills`](https://github.com/vercel-labs/skills) CLI runs.
