@@ -13,7 +13,7 @@ URL → fully populated job note in one shot. The user sees the file and the das
 3. **Identify the apply path.** Form-based / email / DM / PR / intro — see `references/application-fill.md` for the signal patterns. The path determines whether autofill can run at ingest.
 4. **Choose the filename.** Pattern: `<Company> - <Role>.md` at the workspace root. Match the casing of how the company writes its own name. Confirm the exact filename with the user before writing.
 5. **Scaffold from `templates/job-note.md`** and populate frontmatter + the first card. Status defaults to `to_apply`.
-6. **Chain into autofill.** If the apply path is identifiable (form URL fetchable, email address present, DM target known, repo named, etc.), run the autofill playbook in the same step and write the `## Application brief` card. If it isn't (private form, no contact, stub listing), skip and tell the user — they can re-run `autofill` later when they have the missing detail.
+6. **Chain into autofill.** Per the *Command flows* table in `SKILL.md`, `ingest` chains into `autofill` by default. If the apply path is identifiable (form URL fetchable, email address present, DM target known, repo named, etc.), run the autofill playbook in the same step and write the `## Application brief` card. If it isn't (private form, no contact, stub listing), skip and tell the user — they can re-run `autofill` later when they have the missing detail.
 7. **Don't pre-populate later chronological cards.** Only the snapshot/Applied card. Subsequent cards track real events.
 
 ## Output schema

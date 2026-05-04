@@ -11,7 +11,7 @@ If the URL is a **social post** (x.com, twitter.com, linkedin.com, etc.), follow
 
 If I paste the listing text directly instead of a URL (Telegram / Discord / Slack / DM forward), treat the paste as the source and ask me for the channel name and apply target if they aren't obvious.
 
-**Auto-chain into autofill.** I bring listings because I intend to apply — finishing at the file write leaves me halfway. Once the note is written, continue *in the same turn* into the autofill flow (`references/application-fill.md`) using the just-written note as the target. The brief shape depends on the apply path:
+**Auto-chain into autofill.** Per the *Command flows* table in `SKILL.md`, `ingest` chains into `autofill` by default. I bring listings because I intend to apply — finishing at the file write leaves me halfway. Once the note is written, continue *in the same turn* into the autofill flow (`references/application-fill.md`) using the just-written note as the target. The brief shape depends on the apply path:
 
 - Form-based (board with an Apply button) → fetch the form (Ashby `<listing>/application`, Lever `<listing>/apply`, Workable inline, etc.) and fill its real fields
 - Email / DM / PR / intro paths → draft the actual message or PR description per the playbook templates

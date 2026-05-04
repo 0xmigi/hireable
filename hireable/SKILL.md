@@ -326,6 +326,33 @@ These trigger phrases are the **canonical, harness-agnostic interface**. Type th
 
 Natural-language equivalents are first-class — the user doesn't have to use the canonical phrase. But the canonical phrase is the contract: when the user types it, the corresponding playbook runs. If a command is ambiguous about which note (e.g. `autofill` with no slug), ask once, then proceed.
 
+### Command flows
+
+Commands aren't isolated — some chain together by default. Treat this table as load-bearing: when a user's plain-English ask spans multiple commands, the chain runs in one turn, not as a sequence of separate confirmations. Stopping mid-chain because "the slash command finished" is the bug.
+
+#### Default chains
+
+| From | Chains into | Skip when |
+|---|---|---|
+| `ingest` | `autofill` | Apply path can't be determined (private form behind login, no contact info, stub listing). Name the reason in the success line. |
+| `autofill` | ∅ | Always — running it is already an apply-prep step; the user decides when to actually submit. |
+| `tailor` | ∅ | Always — a tailored resume is a per-role file commitment; user-initiated only. |
+| `radar` | ∅ | Always — `radar` is a query, not a sequence. |
+
+#### User intent → canonical sequence
+
+The agent maps the user's phrasing to one of these sequences. The slash command the user types is one *step* of the sequence, not the whole task.
+
+| User says | Sequence |
+|---|---|
+| "track this" / "save this" / "I'm considering this" | `ingest` only (opt out of the default chain by phrasing) |
+| "help me apply" / "prep me to apply" / paste of a URL with apply intent | `ingest → autofill` |
+| "I want to apply with a tailored resume" | `ingest → autofill → tailor` |
+| "tailor my resume for X" | `tailor` |
+| "what's stale" / "what needs a nudge" | `radar` |
+
+When phrasing is genuinely ambiguous ("help me with this role"), ask one question — "are you tracking this or prepping to apply?" — and proceed. Default toward chaining when the user has already named the destination ("apply", "interview prep", "submit"); default toward the no-chain path when the user has only named the artifact ("save", "track", "add to my list").
+
 ### Delegating to a background worker
 
 When a playbook says "delegate this to a background worker" (e.g. an inbox sweep, a bulk re-extraction across many notes, anything where the user is waiting on you to finish a different task), use whatever delegation primitive your harness exposes. The principle is harness-agnostic: hand off the chore so the main thread can keep serving the user.
