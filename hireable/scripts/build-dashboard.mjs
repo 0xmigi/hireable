@@ -939,7 +939,15 @@ async function main() {
     if (!candidates.length) return "";
     return candidates.slice().sort().pop();
   };
+  // Dead threads (rejected / declined / archived) sink to the bottom of the
+  // table so the user's eye lands on live work first. Within each bucket, sort
+  // by most-recent activity, then company name. Accepted offers stay in the
+  // top bucket — those are a positive outcome you still want visible.
+  const isDeadThread = (job) => ["rejected", "declined", "archived"].includes(String(job.status));
   jobs.sort((a, b) => {
+    const aDead = isDeadThread(a);
+    const bDead = isDeadThread(b);
+    if (aDead !== bDead) return aDead ? 1 : -1;
     const ak = activityKey(a);
     const bk = activityKey(b);
     if (ak && bk && ak !== bk) return bk.localeCompare(ak);
