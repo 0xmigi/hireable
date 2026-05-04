@@ -43,7 +43,7 @@ Actions:
 - Read the target role note, `profile.md`, and `targets.md`.
 - Fit-score the opportunity if it has not been scored.
 - Draft tailored bullets, application answers, cover note, recruiter message, or intro ask.
-- Mark the opportunity `drafting`, `ready_to_apply`, or `applied` based on reality.
+- Mark the opportunity `to_apply` (still preparing) or `applied` (submitted) based on reality. The `## Application brief` card on the note tracks readiness within the `to_apply` state.
 
 Outputs:
 

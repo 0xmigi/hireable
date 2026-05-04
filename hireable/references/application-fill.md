@@ -1,14 +1,28 @@
 # Application Fill Playbook
 
-Backs the `hireable autofill <slug>` command. Generates the `## Application brief` card on a job note — the working surface the user copies from when filling an actual application form.
+Backs the `hireable autofill <slug>` command. Generates the `## Application brief` card on a job note — the prepared content the user needs to actually execute the application's `next_action`, in whatever shape that action takes.
 
 ## Goal
 
-The user opens an application form, opens their job note, and clicks chips to copy field-level answers into the form. The brief should match **the fields that form actually asks** — not a generic template. No phantom questions.
+The user opens their job note and has everything they need to act, in the shape the apply path requires. Not a generic template. Not phantom questions. The brief matches the apply path the listing actually demands.
 
-## The critical first step: fetch the actual application form
+## Apply paths, and what the brief looks like for each
 
-Before generating any brief content, fetch the application form and parse its real fields. The brief schema comes from the form. The values come from `profile.md` and `references/application-answers.md`.
+Identify the apply path before generating brief content. The path determines the brief shape; the path is identifiable from the listing source the agent already parsed at ingest.
+
+| Apply path | Signal at ingest | Brief shape |
+|---|---|---|
+| **Form-based** | Listing on Workable / Lever / Ashby / Greenhouse / Gem / direct careers page with an Apply button | Field values + essay drafts mapped to the real form fields |
+| **Email-based** | Post or listing says "send your resume to <email>" / "email <person> at <addr>" | Drafted email (subject + body), attachment list pointing at the right resume |
+| **DM-based** | X or LinkedIn post says "DM me" / "reply to apply" | Drafted DM message, plus the resume to share if asked |
+| **PR-based** | Listing says "to apply, submit a PR to <repo>" or similar | Drafted PR description, suggested scope, target repo |
+| **Intro outreach** | Warm-intro path (someone forwarded the role; user wants to reach the contact) | Drafted intro email or DM with a hook tying user to the role |
+
+If a listing offers multiple apply paths (e.g. "fill the form OR DM me"), prefer the formal one and note the alternative in the brief.
+
+## Form-based: fetch the actual application form
+
+For the form-based path, fetch the application form before generating brief content. The brief schema comes from the form's real fields. The values come from `profile.md` and `references/application-answers.md`.
 
 ### How to find the form URL
 
@@ -38,6 +52,86 @@ Forms often have a "Resume" file input. The brief shouldn't try to "fill" that w
 ### When the form can't be fetched
 
 If the form is behind login (LinkedIn Easy Apply), inside an applicant tracking system that requires JS we can't run, or the URL pattern doesn't match: tell the user plainly, then fall back to a minimal canonical brief (Identity from profile + 1–2 essay slots for cover-letter content). Mark the brief as `(generic — couldn't fetch SpruceID's form, may not match)` so the user knows to verify against the real form before submitting.
+
+## Email-based: draft the actual email
+
+When the apply path is email, the brief contains a ready-to-send email plus the attachment list. Subject line, recipient, body, and the resume filename. Pull the recipient address from the listing verbatim — don't normalize, don't infer.
+
+```markdown
+## Application brief
+
+> Apply path: email to hiring@example.com, per the listing on 2026-05-04.
+
+### Email
+- **To:** hiring@example.com
+- **Subject:** Software Engineer application — Azuolas Compy
+- **Attachment:** resumes/Example_SWE.pdf
+
+### Body
+> Hi <name if known, else "team">,
+>
+> <2–3 paragraph drafted email body grounded in the role snapshot and the user's master resume. Lead with one sentence on the fit, one sentence on the most relevant proof point, one sentence with a clear ask.>
+>
+> Best,
+> Azuolas
+```
+
+The `### Body` section uses a `>` blockquote so the dashboard renders the full text (not truncated as a chip). Don't use `### Cover letter / additional information` here — that section name is reserved for form fields and triggers a different render mode.
+
+## DM-based: draft the message
+
+When the apply path is a DM (X, LinkedIn, Telegram), the brief contains the drafted message plus the handle. Short — DMs are not cover letters.
+
+```markdown
+## Application brief
+
+> Apply path: DM @D3VINE2026 on X, per the post on 2026-05-04.
+
+### DM
+- **To:** @D3VINE2026 (Devine)
+- **Platform:** X
+
+### Message
+> <2–4 sentence drafted DM. Lead with the role and where you saw it, one specific reason for the fit, then a clear ask (e.g. "happy to share my resume — open to a 15-min call?").>
+```
+
+## PR-based: draft the contribution
+
+When the apply path is a PR to a repo, the brief contains the proposed scope and a drafted PR description. The user still has to write the code — the brief just gets them ready.
+
+```markdown
+## Application brief
+
+> Apply path: submit a PR to defillama/DefiLlama-Adapters, per the listing on 2026-05-04.
+
+### PR target
+- **Repo:** defillama/DefiLlama-Adapters
+- **Suggested scope:** <one concrete task — e.g. "add an adapter for protocol X" — grounded in the repo's contributing docs if findable, otherwise the user's own area of expertise>
+
+### PR description draft
+> <Drafted PR title + body, in the format the repo expects. Reference the listing if appropriate.>
+
+### Follow-up
+- **After PR opens:** email <hiring contact> with the PR link + a 1-sentence note on the role
+```
+
+## Intro outreach: draft the reach-out
+
+When the path is a warm intro through a contact, the brief contains the drafted intro message plus the hook tying the user to the role.
+
+```markdown
+## Application brief
+
+> Apply path: reach out to <contact name> for a warm intro, per <forwarder> on 2026-05-04.
+
+### Intro message
+- **To:** <contact name>
+- **Channel:** email / DM
+- **Hook:** <one sentence on why this person would care — shared connection, shared interest, etc.>
+
+### Body
+> <2–3 paragraph drafted message. Specific to the contact, not boilerplate.>
+```
 
 ## Output: the Application brief card
 
@@ -106,10 +200,11 @@ The agent should match form labels to answer-library keys generously: "Phone Num
 
 ## Triggering
 
-- Direct: `hireable autofill <slug>`, `autofill <slug>`, `draft application answers for <slug>`.
-- Implicit: when the user moves a job note's `status` to `drafting` and there's no `## Application brief` card yet, offer to run `autofill` — don't just do it silently.
+- **At ingest (default):** `hireable ingest` chains into autofill once the apply path is identifiable. The agent writes the brief in the same step it scaffolds the note. This is the path most users see.
+- **Direct (re-runnable):** `hireable autofill <slug>`, `autofill <slug>`, `draft application answers for <slug>` — overwrites the existing brief. Use when the form has changed, the apply path has changed (e.g. an X post was followed up with an email), or the user wants a fresh pass.
+- **Skip-at-ingest cases:** if the apply path can't be determined from the listing (private form behind a login, no contact info, listing is a stub), scaffold the note without a brief and tell the user. The user re-runs `autofill` later when they have the missing detail.
 
-If the slug is ambiguous, list candidates and ask. If there's only one currently-drafting note, default to that.
+If the slug is ambiguous, list candidates and ask. If only one note has `status: to_apply` and no brief, default to that.
 
 ## Scaffolding `application-answers.md`
 

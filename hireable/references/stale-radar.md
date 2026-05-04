@@ -22,8 +22,6 @@ The radar is opinionated about what counts as "stale" by status. These are start
 | `recruiter` / `screen` | 5 days no reply | Follow-up to the named contact. Reference the last point of contact. |
 | `interview` / `takehome` / `final` | 3 days no reply (or `deadline` within 48h) | High priority. Likely needs a thank-you note or a "checking in" message. |
 | `offer` / `negotiation` | Always surface | Decision-time threads always show up regardless of `last_interaction`. |
-| `drafting` / `ready_to_apply` | 5 days since note created | The user started this and stalled. Surface as "decide: ship or archive." |
-| `lead` / `qualified` | 14 days | Surface as "decide: pursue or archive." |
 | `to_apply` | 7 days | Surface as "this is sitting — apply, deprioritize, or archive." |
 | `accepted` / `declined` / `rejected` / `archived` | Never | Don't surface. |
 

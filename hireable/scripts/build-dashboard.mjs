@@ -101,8 +101,7 @@ function isDue(date) {
 
 function stageForStatus(status) {
   const value = String(status || "").toLowerCase();
-  if (["lead", "qualified"].includes(value)) return "lead";
-  if (["to_apply", "drafting", "ready_to_apply"].includes(value)) return "application";
+  if (value === "to_apply") return "to_apply";
   if (["offer", "negotiation"].includes(value)) return "offer";
   if (value === "accepted") return "landed";
   if (["rejected", "declined", "archived"].includes(value)) return "archive";
@@ -973,7 +972,7 @@ async function main() {
   const stages = [
     { key: "setup", label: "Setup", detail: setup.gaps.length ? `${setup.gaps.length} gaps` : "Minimum context" },
     { key: "positioning", label: "Positioning", detail: /TODO/.test(profile) ? "Draft profile" : "Profile ready" },
-    { key: "application", label: "Apply", detail: `${stageCounts.application || 0} queued` },
+    { key: "application", label: "Apply", detail: `${stageCounts.to_apply || 0} queued` },
     { key: "pipeline", label: "Pipeline", detail: `${activeJobs.length} active` },
     { key: "follow_up", label: "Follow-up", detail: `${dueJobs.length} actions` },
     { key: "offer", label: "Offer", detail: `${stageCounts.offer || 0} open` },
@@ -1865,7 +1864,7 @@ async function main() {
           </div>
           <div class="chips">
             <button class="chip active" type="button" data-quick-filter="all">All</button>
-            <button class="chip" type="button" data-quick-filter="leads">Leads</button>
+            <button class="chip" type="button" data-quick-filter="to-apply">To Apply</button>
             <button class="chip" type="button" data-quick-filter="active">Active</button>
             <button class="chip" type="button" data-quick-filter="attention">Needs action</button>
             <button class="chip" type="button" data-quick-filter="applied">Applied+</button>
@@ -1965,7 +1964,7 @@ async function main() {
       for (const row of rows) {
         const matchesQuick =
           quickFilter === "all" ||
-          (quickFilter === "leads" && row.dataset.stage === "lead") ||
+          (quickFilter === "to-apply" && row.dataset.stage === "to_apply") ||
           (quickFilter === "active" && row.dataset.active === "true") ||
           (quickFilter === "attention" && row.dataset.attention === "true") ||
           (quickFilter === "applied" && row.dataset.applied === "true") ||

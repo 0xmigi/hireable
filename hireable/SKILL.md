@@ -221,9 +221,38 @@ tags: [jobs]
 
 The first block of fields (`location` through `link`) is the **role snapshot** — the durable defining info that answers "why is this an entry on my dashboard?" The dashboard shows these at the top of the drawer, above the chronological cards. Populate them when you scaffold the note (fetch the listing URL via web fetch / Chrome MCP if you have it, parse the comp range, department, etc.).
 
-Allowed `status` values: `lead`, `qualified`, `to_apply`, `drafting`, `ready_to_apply`, `applied`, `intro`, `recruiter`, `screen`, `interview`, `takehome`, `final`, `offer`, `negotiation`, `accepted`, `declined`, `rejected`, `archived`.
+Allowed `status` values: `to_apply`, `applied`, `intro`, `recruiter`, `screen`, `interview`, `takehome`, `final`, `offer`, `negotiation`, `accepted`, `declined`, `rejected`, `archived`.
+
+Pre-application is one state (`to_apply`), not five. The agent's pre-write fit-check is the qualification step — by the time a note exists, the role is already worth tracking. Application prep used to be tracked as a separate `drafting` / `ready_to_apply` status; that's now collapsed into "does the `## Application brief` card exist on the note yet."
 
 When the user brings a new listing (URL or paste), scaffold a note from `templates/job-note.md`, populate as much frontmatter as the listing provides, and confirm the filename with the user before saving.
+
+#### Status transitions: auto, propose, user-only
+
+Three modes, listed by escalating user involvement. The signal must clear the bar for the mode it claims.
+
+- **Auto** — agent flips the status without asking. Signal must be unambiguous.
+- **Propose** — agent surfaces the candidate transition and waits for confirmation. Signal exists but interpretation might be wrong.
+- **User-only** — never moves without explicit user instruction.
+
+| Status | Mode | Trigger / signal |
+|---|---|---|
+| `to_apply` | **Auto** | Default landing state when the agent ingests a listing or paste and has done a quick CV-vs-listing fit-check. |
+| `applied` | **Auto** | Application-receipt email lands in connected inbox, OR user says "I just applied to X." |
+| `intro` | **Propose** | Recognized referral / intro pattern in inbox (known contact, intro language). Fuzzy enough to confirm. |
+| `recruiter` | **Auto** | Inbound from a recruiter-style sender (in-house TA, recruiting agency). Easy to detect from sender + tone. |
+| `screen` | **Auto** | Calendar invite with "screen" / "intro call" / "first call" wording, matched to the thread. |
+| `interview` | **Auto** | Calendar invite for a substantive interview round (with engineers, after a screen, etc.), matched to the thread. |
+| `takehome` | **Auto** | Email containing assignment instructions plus a deadline. |
+| `final` | **Propose** | Recruiter says "final round" / "last step" — language varies enough to confirm. |
+| `offer` | **Propose** | Offer letter PDF, or email naming a comp number. Always confirm — getting this wrong is costly. |
+| `negotiation` | **User-only** | Strategic choice; never auto. |
+| `accepted` | **User-only** | Major decision; never auto. |
+| `declined` | **User-only** | User's call; never auto. |
+| `rejected` | **Propose** | "Won't be moving forward" / "decided to go with another candidate" patterns. Auto-detect, but confirm — sometimes recruiters pivot the candidate to a different role. |
+| `archived` | **User-only** | Surface stale threads via `radar`; user decides what to archive. |
+
+Propose-mode transitions land as a one-liner in chat ("Looks like Trail of Bits sent a take-home — moving status to `takehome` and logging the email as a card. OK?") — light touch, doesn't block, doesn't silently mutate state.
 
 #### `next_action` is the user's *committed* immediate step — not your inference
 
@@ -291,7 +320,7 @@ These trigger phrases are the **canonical, harness-agnostic interface**. Type th
 |---|---|---|---|
 | `hireable help` | `hireable help`, `what can you do` | Print this table. | — |
 | `hireable ingest <url>` | `ingest <url>`, `add this listing`, paste of a job URL | Fetch the listing, extract role metadata, scaffold a job note from the template, populate the snapshot card. Confirms filename before writing. | `references/listing-extraction.md` |
-| `hireable autofill <slug>` | `autofill <slug>`, `draft application answers for <slug>`, on `status: drafting` transition | Generate or refresh the `## Application brief` card on a job note: identity + logistics + short-essay answers, derived from `profile.md`, `references/application-answers.md`, and the role snapshot. Leaves blanks (with `[needs:<field>]` markers) when source data is missing — never fabricates. | `references/application-fill.md` |
+| `hireable autofill <slug>` | `autofill <slug>`, `draft application answers for <slug>` | Generate or refresh the `## Application brief` card on a job note — the prepared content for executing `next_action`, whatever shape that action takes (form fields, drafted email, drafted DM, PR description, intro outreach). Runs automatically at ingest when an apply path is identifiable; otherwise re-runnable on demand. Leaves blanks (with `[needs:<field>]` markers) when source data is missing — never fabricates. | `references/application-fill.md` |
 | `hireable radar` | `radar`, `what's stale`, `what threads need a nudge` | Scan all job notes' frontmatter (and connected channels if any), surface threads past their natural follow-up window, propose actions one line per thread. Doesn't draft or send unless asked. | `references/stale-radar.md` |
 | `hireable tailor <slug>` | `tailor my resume for <slug>`, `tailor <slug>` | Propose 3–5 specific bullet swaps on the master resume for the given role, save the result to `resumes/<descriptor>.pdf` after user approval, update the note's `resume_used`. Never invents numbers not present in the master. | `references/resume-tailor.md` |
 
@@ -312,20 +341,17 @@ The skill never assumes a specific delegation API. It assumes only that *some* m
 
 ### The application brief card
 
-`autofill` writes a `## Application brief` card on the job note. Unlike chronological event cards, the brief card has no date and is mutable — it's the working surface for application content. The dashboard renders each `**Field:** value` line as a copy-able chip. Structure:
+`autofill` writes a `## Application brief` card on the job note. Unlike chronological event cards, the brief card has no date and is mutable — it's the prepared content for executing `next_action`, in whatever shape that action takes:
 
-```markdown
-## Application brief
+- **Form-based apply** (Workable, Lever, Ashby, Greenhouse, etc.) → field values + essay drafts, rendered as a chip grid
+- **Email-based apply** (post says "send your resume to hiring@xyz.com") → drafted email body, subject line, attachment list pointing at the right resume
+- **DM-based apply** (X / LinkedIn post says "DM me") → drafted DM message
+- **PR-based apply** ("submit a PR to our repo to apply") → drafted PR description, scope, target repo
+- **Intro outreach** (warm intro path) → drafted intro email or DM with a hook
 
-- **Full name:** Azuolas Compy
-- **Email:** ...
-- **Why this company:** (1–2 sentences, role-specific)
-- **Why this role:** (1–2 sentences, role-specific)
-- **Project you're proud of:** (reusable answer from application-answers.md)
-- **Comp expectation:** [needs:comp_floor]
-```
+The agent picks the brief shape based on the apply path identified at ingest. The full schema for each shape lives in `references/application-fill.md`.
 
-`[needs:<field>]` markers tell the dashboard the field is unfilled because source data is missing — they show as flagged chips, not silent blanks.
+`[needs:<field>]` markers tell the dashboard the field is unfilled because source data is missing — they show as flagged chips, not silent blanks. Never fabricate values to clear a marker.
 
 ## The dashboard
 
