@@ -566,8 +566,8 @@ function renderBriefChips(innerHtml) {
 // surface always pins to the top of the job detail, regardless of where the
 // user wrote it in the markdown.
 function countBriefChips(chipHtml) {
-  const totalChips = (chipHtml.match(/class="brief-chip[^"]*"/g) || []).length;
-  const totalEssays = (chipHtml.match(/class="brief-essay[^"]*"/g) || []).length;
+  const totalChips = (chipHtml.match(/class="brief-chip(?: (?:needs|empty))?"/g) || []).length;
+  const totalEssays = (chipHtml.match(/class="brief-essay(?: (?:needs|empty))?"/g) || []).length;
   const total = totalChips + totalEssays;
   const needs = (chipHtml.match(/class="brief-(?:chip|essay) needs"/g) || []).length;
   const empty = (chipHtml.match(/class="brief-(?:chip|essay) empty"/g) || []).length;
