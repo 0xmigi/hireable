@@ -152,13 +152,19 @@ Fast-path conditions (all must hold):
 - `comp` is either a real range from JSON-LD / the page, or unambiguously "Not listed" (no "competitive" / "DOE" / "negotiable" phrasing)
 - The filename `<Company> - <Role>.md` does not collide with an existing note for a different version of this role
 
-When all conditions hold, write the file directly and output a **single-line success message**:
+When all conditions hold, write the file directly, then chain into autofill (per step 6 above) without pausing, then output a **single-line success message** covering both steps:
 
 ```
-Wrote `SpruceID - Full-Stack Software Engineer.md` ✓ — view in dashboard.
+Wrote `SpruceID - Full-Stack Software Engineer.md` + brief ✓ — view in dashboard.
 ```
 
-Don't preview values. Don't paste the snapshot card. Don't echo the frontmatter. The dashboard is the surface for verifying what landed; the chat just confirms the action.
+If the brief was skipped because the apply path wasn't determinable (private form, no contact info, stub listing), name the reason in parens:
+
+```
+Wrote `SpruceID - Full-Stack Software Engineer.md` ✓ (brief skipped: form requires login) — view in dashboard.
+```
+
+Don't preview values. Don't paste the snapshot card. Don't echo the frontmatter. Don't stop after the file write and ask whether to autofill — chain into it. The dashboard is the surface for verifying what landed; the chat just confirms the action.
 
 Always fall back to the standard confirmation step (below) when:
 - Source is a social post (X / LinkedIn — unstructured by nature, deserves user eyes)

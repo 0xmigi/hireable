@@ -3,7 +3,7 @@ description: Fetch a job listing URL and scaffold a populated job note
 argument-hint: <listing-url>
 ---
 
-Activate the hireable skill and run `hireable ingest` for the URL below. Follow `references/listing-extraction.md`: fetch the listing, extract the role metadata, scaffold the note from `templates/job-note.md`, and confirm the filename with me before writing the file.
+Activate the hireable skill and run `hireable ingest` for the URL below. Follow `references/listing-extraction.md`: fetch the listing, extract the role metadata, identify the apply path, scaffold the note from `templates/job-note.md`, and confirm the filename with me before writing the file.
 
 If the URL is a job board (Workable / Lever / Ashby / Greenhouse / Gem / direct careers), use the per-board hints in the playbook.
 
@@ -11,6 +11,18 @@ If the URL is a **social post** (x.com, twitter.com, linkedin.com, etc.), follow
 
 If I paste the listing text directly instead of a URL (Telegram / Discord / Slack / DM forward), treat the paste as the source and ask me for the channel name and apply target if they aren't obvious.
 
-**Be tight with chat output.** When the fast-path conditions in the playbook hold (recognized board, unambiguous fields, no filename collision), skip the multi-paragraph "I'm fetching… extracting… here's what I found… should I save?" preview entirely. Write the file directly and output one line: `Wrote <filename> ✓ — view in dashboard.` Save my eyes for the dashboard, not the chat.
+**Auto-chain into autofill.** I bring listings because I intend to apply — finishing at the file write leaves me halfway. Once the note is written, continue *in the same turn* into the autofill flow (`references/application-fill.md`) using the just-written note as the target. The brief shape depends on the apply path:
+
+- Form-based (board with an Apply button) → fetch the form (Ashby `<listing>/application`, Lever `<listing>/apply`, Workable inline, etc.) and fill its real fields
+- Email / DM / PR / intro paths → draft the actual message or PR description per the playbook templates
+
+Only skip the chain when the apply path genuinely isn't determinable (private form behind login, no contact info, stub listing) — and name the reason in the success line.
+
+**Be tight with chat output.** When the fast-path conditions in the playbook hold (recognized board, unambiguous fields, no filename collision), skip the multi-paragraph "I'm fetching… extracting… here's what I found… should I save?" preview entirely. Write the file, run autofill, then output one line:
+
+- Both succeeded: `Wrote <filename> + brief ✓ — view in dashboard.`
+- Brief skipped: `Wrote <filename> ✓ (brief skipped: <one-phrase reason>) — view in dashboard.`
+
+Save my eyes for the dashboard, not the chat.
 
 URL: $ARGUMENTS
