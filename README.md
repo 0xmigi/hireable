@@ -4,6 +4,8 @@
 
 A personal job-search skill for AI agents. You bring the job listings; the agent runs the rest — resume, applications, pipeline, follow-ups, offers. Markdown is the source of truth; a local dashboard renders it.
 
+![hireable dashboard](hireable/assets/dashboard.png)
+
 Works in Claude Code, Codex, OpenClaw, Cursor, Hermes, and anywhere else the [`skills`](https://github.com/vercel-labs/skills) CLI runs.
 
 ## Install
