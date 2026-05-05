@@ -36,11 +36,23 @@ After user approval (`approve`, `looks good`, `proceed`) or per-bullet edits:
 
 ## Rules
 
-- **Propose 3–5 swaps. Not 10. Not 1.** Resume tailoring has diminishing returns — the top 3–5 highest-leverage changes are what matter. Surface them and stop.
-- **Each proposal is a one-for-one swap**, not an addition. The master has a fixed length the user has chosen; tailoring shifts emphasis, not size. If the user wants a fresh bullet, they'll say so.
+- **The default is 0 swaps. Tailoring is the exception, not the rule.** Most masters cover most roles — that's what makes them masters. Before drafting any swap, do an honest scan: what does this role *specifically* ask for that the master doesn't already name? If the answer is "nothing meaningful," recommend `master.pdf` and stop. See *When tailoring isn't worth it* below.
+- **A swap must change which concept is on the page, not just the wording.** "Built" → "shipped", "real-time pipelines" → "mission-critical real-time pipeline", "made decisions" → "owning decisions" — that's synonym shuffling. Skip it. The bar to clear: the swap surfaces a keyword, project, or angle the master doesn't already cover.
+- **Cap at 3 swaps. 0–2 is normal.** If you find more than 3 genuinely-substantive swaps, the master is thin for this role family — the right move is `positioning` mode (strengthen the master), not `tailor` (mask the gap on one role).
+- **Each proposal is a one-for-one swap**, not an addition. The master has a fixed length the user has chosen.
 - **Never invent metrics.** If the existing master bullet says "shipped a real-time pipeline," the tailored version can sharpen it ("shipped a real-time WebRTC + on-chain state pipeline") but cannot add "serving 10k users" if that number isn't already documented in `profile.md` or master. Ask before adding any number.
-- **Tailoring is reordering and emphasis, not fabrication.** Use the same employers, dates, and projects. Re-language them for relevance.
+- **Tailoring is reordering and emphasis, not fabrication.** Use the same employers, dates, and projects.
 - **Don't propose swaps that make the bullet less true.** If the master says "evaluated 50+ grants" and the role wants product judgment, the tailor can lean into the judgment angle without dropping the number.
+
+## When tailoring isn't worth it
+
+If the master already names the keywords, projects, and angles the role asks for, say so plainly and stop:
+
+> "Your master already covers what *<Company>* asks for — Solana production, on-chain state, real-time pipelines, founder shipping solo. No tailoring needed; attach `master.pdf`."
+
+Then update the note's `resume_used` to `resumes/master.pdf` and exit. **Don't draft synonym swaps to fill the slot — that's bloatware behavior.**
+
+This is the right answer surprisingly often. A well-built master is engineered to cover most roles you target. If `tailor` rarely produces real swaps, the master is doing its job — that's a signal of quality, not a problem to solve.
 
 ## Choosing the descriptor
 
@@ -58,6 +70,7 @@ Confirm the descriptor with the user once before writing.
 - Doesn't generate a cover letter — that's drafting, separate ask.
 - Doesn't fill the application brief — that's `hireable autofill`.
 - Doesn't critique the master ("this bullet is weak"). Tailoring is in service of one specific role, not general resume coaching.
+- Doesn't push edits when the master already fits the role. The honest answer is "use master.pdf"; deliver it without ceremony.
 
 ## When master is missing or thin
 

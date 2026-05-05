@@ -220,4 +220,5 @@ If the file doesn't exist:
 - Doesn't submit anything.
 - Doesn't fill fields the user must verify (demographic, sometimes-changing things like "expected start date" depending on submission timing).
 - Doesn't tailor your resume — that's `hireable tailor`.
+- **Doesn't reflexively offer to tailor after writing the brief.** The default for most roles is `master.pdf`; tailoring is the exception, not the rule. Only chain into `tailor` if the user explicitly asks ("tailor my resume too", "with a tailored resume"). When the brief lands, set `resume_used: "resumes/master.pdf"` on the note and stop — don't ask "want me to run tailor?" reflexively.
 - Doesn't produce a generic brief when a real form was fetchable. Quality > template completeness.

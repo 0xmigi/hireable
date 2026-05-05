@@ -335,8 +335,8 @@ Commands aren't isolated — some chain together by default. Treat this table as
 | From | Chains into | Skip when |
 |---|---|---|
 | `ingest` | `autofill` | Apply path can't be determined (private form behind login, no contact info, stub listing). Name the reason in the success line. |
-| `autofill` | ∅ | Always — running it is already an apply-prep step; the user decides when to actually submit. |
-| `tailor` | ∅ | Always — a tailored resume is a per-role file commitment; user-initiated only. |
+| `autofill` | ∅ | Always — running it is already an apply-prep step; the user decides when to actually submit. **Don't reflexively offer `tailor` after the brief lands** — the default is `master.pdf`, tailoring is the exception. |
+| `tailor` | ∅ | Always — a tailored resume is a per-role file commitment; user-initiated only. The honest answer is often "no tailoring needed, use master.pdf"; deliver that without ceremony when it's the right call. |
 | `radar` | ∅ | Always — `radar` is a query, not a sequence. |
 
 #### User intent → canonical sequence
